@@ -97,11 +97,16 @@ export async function internalMutate<Data>(
       cache
     ) as GlobalState
 
+    console.log('mutating', key)
+
     const startRevalidate = () => {
+      console.log('revalidating init', key)
       const revalidators = EVENT_REVALIDATORS[key]
       const revalidate = isFunction(options.revalidate)
         ? options.revalidate(get().data, _k)
         : options.revalidate !== false
+
+      console.log('will revalidate?', revalidate, key)
       if (revalidate) {
         // Invalidate the key by deleting the concurrent request markers so new
         // requests will not be deduped.
@@ -118,6 +123,7 @@ export async function internalMutate<Data>(
 
     // If there is no new data provided, revalidate the key with current state.
     if (args.length < 3) {
+      console.log('no new data provided', key)
       // Revalidate and broadcast state.
       return startRevalidate()
     }
@@ -161,11 +167,15 @@ export async function internalMutate<Data>(
 
     // `data` is a promise/thenable, resolve the final data first.
     if (data && isPromiseLike(data)) {
+      console.log('`data` is a promise/thenable', key)
+
       // This means that the mutation is async, we need to check timestamps to
       // avoid race conditions.
       data = await (data as Promise<Data>).catch(err => {
         error = err
       })
+
+      console.log('awaited data', data, key)
 
       // Check if other mutations have occurred since we've started this mutation.
       // If there's a race we don't update cache or broadcast the change,
@@ -186,6 +196,7 @@ export async function internalMutate<Data>(
     // If we should write back the cache after request.
     if (populateCache) {
       if (!error) {
+        console.log('populate cache', data, committedData, key)
         // Transform the result into data.
         if (isFunction(populateCache)) {
           const populateCachedData = populateCache(data, committedData)
