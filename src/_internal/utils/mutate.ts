@@ -70,13 +70,14 @@ export async function internalMutate<Data>(
   // If the second argument is a key filter, return the mutation results for all
   // filtered keys.
   if (isFunction(_key)) {
+    const includeSpecialKeys = options.includeSpecialKeys
     const keyFilter = _key
     const matchedKeys: Key[] = []
     const it = cache.keys()
     for (const key of it) {
       if (
         // Skip the special useSWRInfinite and useSWRSubscription keys.
-        !/^\$(inf|sub)\$/.test(key) &&
+        (includeSpecialKeys || !/^\$(inf|sub)\$/.test(key)) &&
         keyFilter((cache.get(key) as { _k: Arguments })._k)
       ) {
         matchedKeys.push(key)

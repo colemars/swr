@@ -45,6 +45,7 @@ const EMPTY_PROMISE = Promise.resolve() as Promise<undefined>
 // }
 
 export { unstable_serialize } from './serialize'
+export { INFINITE_PREFIX }
 
 // export const unstable_serialize = (getKey: SWRInfiniteKeyLoader) => {
 //   return INFINITE_PREFIX + getFirstPageKey(getKey)
